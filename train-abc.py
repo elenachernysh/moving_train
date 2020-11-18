@@ -1,3 +1,4 @@
+import sys
 import time
 import os
 import re
@@ -79,15 +80,18 @@ class Train(MovableObject):
         return [" " * (self.the_most_long_part+1-len(i)) + self.replace_all_symbols(i[::-1]) for i in self.train]
 
     def moving_right(self):
-        for i in range(1, self.distance):
-            super(Train, self).moving_distance(current_position=i, the_most_long_part=self.the_most_long_part)
-            end = self.space_left if self.space_left else self.distance
-            if i == self.distance - 1:
-                self.moving_left(i)
-            else:
-                print('\033[93m\n'.join((i * " ") + t[:end] for t in self.train))
-            time.sleep(self.speed)
-            os.system('clear')
+        try:
+            for i in range(1, self.distance):
+                super(Train, self).moving_distance(current_position=i, the_most_long_part=self.the_most_long_part)
+                end = self.space_left if self.space_left else self.distance
+                if i == self.distance - 1:
+                    self.moving_left(i)
+                else:
+                    print('\033[93m\n'.join((i * " ") + t[:end] for t in self.train))
+                time.sleep(self.speed)
+                os.system('clear')
+        except KeyboardInterrupt:
+            sys.exit(0)
 
     def moving_left(self, i):
         for i in range(self.distance, 1, -1):
