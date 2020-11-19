@@ -1,7 +1,6 @@
 import sys
 import time
 import os
-import re
 from abc import ABC
 from typing import Optional
 
@@ -31,15 +30,15 @@ class MovableObject(ABC):
 class Train(MovableObject):
     train = (
         ",------,  _____",
-        "|______: \57\57\57|\134\134\134",
+        "|______: ///|\\\\\\",
         "|      | \-----/",
         "|      |  \   /",
         "|      |___,_._,--",
         "|          |:| |  |",
         "|   .--.   |:| |  c",
         "|  /    \  |:| |  |",
-        "|_ : || :     ,-, |\134",
-        "' -\ '==/=====o|--|\134\134"
+        "|_ : || :     ,-, |\\",
+        "' -\ '==/=====o|--|\\\\"
     )
 
     def __init__(self, speed: float) -> None:
@@ -50,26 +49,36 @@ class Train(MovableObject):
         return len(max(self.train, key=len))
 
     @staticmethod
-    def find_indexes_of_symbols_in_string(symbol: str, string_to_search: str) -> list:
-        return [m.start() for m in re.finditer(symbol, string_to_search)]
+    def find_indexes_of_symbols_in_string(symbol: str, string_to_search: list) -> list:
+        return [i for i, x in enumerate(string_to_search) if x == symbol]
 
     @staticmethod
-    def replace_symbols_by_index(string_to_search: str, new_symbol: str, index_list: list) -> str:
+    def replace_symbols_by_index(string_to_search: list, new_symbol: str, index_list: list) -> str:
         for i in index_list:
-            string_to_search = string_to_search[:i] + new_symbol + string_to_search[i+1:]
-        return string_to_search
+            string_to_search[i] = new_symbol
+        return ''.join(chr(int(i)) for i in string_to_search)
 
     @staticmethod
-    def clear():
-        return os.system('clear')
+    def string_to_ascii(string: str):
+        return [str(ord(i)) for i in string]
+
+    def train_str_to_ascii(self):
+        return [self.string_to_ascii(i) for i in self.train]
+
+    @staticmethod
+    def ascii_to_string(string_list: list) -> str:
+        return ''.join(chr(int(i)) for i in string_list)
+
+    def train_ascii_to_str(self):
+        return [self.ascii_to_string(i) for i in self.train_str_to_ascii()]
 
     def replace_all_symbols(self, string_to_search: str) -> str:
-        list_index_left_lines = self.find_indexes_of_symbols_in_string(symbol=chr(ord('/')), string_to_search=string_to_search)
-        list_index_right_lines = self.find_indexes_of_symbols_in_string(symbol=r'\\', string_to_search=string_to_search)
-
-        string_to_search = self.replace_symbols_by_index(string_to_search=string_to_search, new_symbol="\\",
+        ascii_string = self.string_to_ascii(string_to_search)
+        list_index_left_lines = self.find_indexes_of_symbols_in_string(symbol='47', string_to_search=ascii_string)
+        list_index_right_lines = self.find_indexes_of_symbols_in_string(symbol='92', string_to_search=ascii_string)
+        string_to_search = self.replace_symbols_by_index(string_to_search=ascii_string, new_symbol='92',
                                                          index_list=list_index_left_lines)
-        string_to_search = self.replace_symbols_by_index(string_to_search=string_to_search, new_symbol="/",
+        string_to_search = self.replace_symbols_by_index(string_to_search=ascii_string, new_symbol='47',
                                                          index_list=list_index_right_lines)
         return string_to_search
 
@@ -103,4 +112,3 @@ class Train(MovableObject):
 
 train = Train(speed=0.05)
 train.moving_right()
-
